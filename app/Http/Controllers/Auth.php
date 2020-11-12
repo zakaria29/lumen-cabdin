@@ -50,7 +50,7 @@ class Auth extends Controller
     {
       $username = $request->username;
       $password = sha1($request->password);
-      $admin = AdminSekolah::where("username", $username)->where("password", $password);
+      $admin = AdminSekolah::where("username", $username)->where("password", $password)->with("sekolah");
       if ($admin->count() > 0) {
         $adm = $admin->first();
         $token = Crypt::encrypt(json_encode($adm));
@@ -75,7 +75,7 @@ class Auth extends Controller
           return response([
             "auth" => true,
             "admin_sekolah" => AdminSekolah::where("id_admin_sekolah", $admin->id_admin_sekolah)
-            ->first()
+            ->with("sekolah")->first()
           ]);
         }else{
           return response(["auth" => false]);

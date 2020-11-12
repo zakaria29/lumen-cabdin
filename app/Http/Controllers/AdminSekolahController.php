@@ -24,6 +24,11 @@ class AdminSekolahController extends Controller
     }
   }
 
+  public function getById($id)
+  {
+    return response(AdminSekolah::where("id_admin_sekolah", $id)->with("sekolah")->first());
+  }
+
   public function save(Request $request)
   {
     try {

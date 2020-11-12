@@ -34,6 +34,23 @@ class SuratController extends Controller
     }
   }
 
+  public function getBySekolah($id_sekolah, $limit = null, $offset = null)
+  {
+    if ($limit == null  || $offset == null) {
+      return response([
+        "surat" => Surat::where("id_sekolah", $id_sekolah)
+        ->with("sekolah")->orderBy("waktu","desc")->get(),
+        "count" => Surat::where("id_sekolah", $id_sekolah)->count()
+      ]);
+    } else {
+      return response([
+        "surat" => Surat::where("id_sekolah", $id_sekolah)
+        ->with("sekolah")->orderBy("waktu","desc")->take($limit)->skip($offset)->get(),
+        "count" => Surat::where("id_sekolah", $id_sekolah)->count()
+      ]);
+    }
+  }
+
   public function save(Request $request)
   {
     $folderId = "1GWyg6rxy7tQCSiTd_zsJKPVeje6x1LRD";
@@ -125,6 +142,25 @@ class SuratController extends Controller
   {
     $find = $request->find;
     $result = Surat::whereRaw('MATCH (`nomor_surat`, `prihal`, `file_surat`) AGAINST (?)' , array($find))
+    ->with("sekolah")->orderBy("waktu","desc");
+    if ($limit == null || $offset == null) {
+      return response([
+        "count" => $result->count(),
+        "surat" => $result->get()
+      ]);
+    } else {
+      return response([
+        "count" => $result->count(),
+        "surat" => $result->take($limit)->skip($offset)->get(),
+      ]);
+    }
+  }
+
+  public function findBySekolah($id_sekolah, $limit = null, $offset = null, Request $request)
+  {
+    $find = $request->find;
+    $result = Surat::where("id_sekolah", $id_sekolah)
+    ->whereRaw('MATCH (`nomor_surat`, `prihal`, `file_surat`) AGAINST (?)' , array($find))
     ->with("sekolah")->orderBy("waktu","desc");
     if ($limit == null || $offset == null) {
       return response([

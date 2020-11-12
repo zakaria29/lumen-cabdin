@@ -80,4 +80,13 @@ class SekolahController extends Controller
     }
   }
 
+  public function summary()
+  {
+    return response([
+      "sd" => Sekolah::where("jenjang", "SD")->count(),
+      "smp" => Sekolah::where("jenjang", "SMP")->count(),
+      "sma" => Sekolah::where("jenjang", "SMA/SMK")->count()
+    ]);
+  }
+
 }

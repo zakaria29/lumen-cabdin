@@ -27,6 +27,22 @@ class JurnalController extends Controller
     }
   }
 
+  public function getBySekolah($id_sekolah, $limit = null, $offset = null)
+  {
+    if ($limit == null  || $offset == null) {
+      return response([
+        "jurnal" => Jurnal::where("id_sekolah", $id_sekolah)->with("sekolah")->get(),
+        "count" => Jurnal::where("id_sekolah", $id_sekolah)->count()
+      ]);
+    } else {
+      return response([
+        "jurnal" => Jurnal::where("id_sekolah", $id_sekolah)
+        ->with("sekolah")->take($limit)->skip($offset)->get(),
+        "count" => Jurnal::where("id_sekolah", $id_sekolah)->count()
+      ]);
+    }
+  }
+
   public function save(Request $request)
   {
     $folderId = "1XaGvqSY3_KJhdLwnQSCtWMaupHAjJyTK";
@@ -124,6 +140,25 @@ class JurnalController extends Controller
   {
     $find = $request->find;
     $result = Jurnal::whereRaw('MATCH (`judul_jurnal`, `penulis`, `kategori`, `file_jurnal`) AGAINST (?)' , array($find))
+    ->with("sekolah");
+    if ($limit == null || $offset == null) {
+      return response([
+        "count" => $result->count(),
+        "jurnal" => $result->get()
+      ]);
+    } else {
+      return response([
+        "count" => $result->count(),
+        "jurnal" => $result->take($limit)->skip($offset)->get(),
+      ]);
+    }
+  }
+
+  public function findBySekolah($id_sekolah, $limit = null, $offset = null, Request $request)
+  {
+    $find = $request->find;
+    $result = Jurnal::where("id_sekolah", $id_sekolah)
+    ->whereRaw('MATCH (`judul_jurnal`, `penulis`, `kategori`, `file_jurnal`) AGAINST (?)' , array($find))
     ->with("sekolah");
     if ($limit == null || $offset == null) {
       return response([
